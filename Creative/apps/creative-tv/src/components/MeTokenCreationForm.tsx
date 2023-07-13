@@ -16,46 +16,94 @@ export default function MeTokenCreationForm() {
         // do something with the form data
     };
 
-    return (
-      <>
+    const inputBoxStyle = {
+        borderRadius: '4px',
+        display: 'flex',
+        width: '300px',        
+        marginBottom: '10px',
+        padding: '15px',
+        };
 
-        <form onSubmit={handleSubmit} style={{ border: '2px solid black', height: '400px', display: 'flex', flexDirection: 'column', padding: '1em', backgroundColor: 'lightgray' }}>
-        <h1 style={{ marginBottom: '1em', fontSize: 'xl' }}>MeToken Creation Form</h1>
+
+    return (
+      <> 
+
+        <form onSubmit={handleSubmit} 
+            style={{ 
+            backgroundColor: '#171923', 
+            border: '2px solid #EDEDEE', 
+            borderRadius: '15px', 
+            width: '100%', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            padding: '1rem', 
+            alignItems: 'center',
+            marginBottom: '30px',
+            }}>
+        <h1 style={{ 
+            marginBottom: '1em',
+            fontSize: '2em',
+            fontWeight: 'bold',
+            }}
+            >MeToken Creation Form</h1>
             <label>
-                Name:
+                <strong>Name: </strong>
                 <input
                     type="text"
+                    placeholder='Your meToken Name'
                     value={name}
                     onChange={e => setName(e.target.value)}
+                    style={ inputBoxStyle }
                 />
             </label>
             <label>
-                Symbol:
+                <strong>Symbol: </strong>
                 <input
                     type="text"
+                    placeholder='Your meToken symbol'
                     value={symbol}
                     onChange={e => setSymbol(e.target.value)}
+                    style={ inputBoxStyle }
                 />
             </label>
             <label>
-                Hub ID:
+                <strong>Hub ID: </strong>
                 <input
                     type="number"
+                    placeholder='Your Hub ID number'
                     value={hubId}
                     onChange={e => setHubId(parseInt(e.target.value, 10))}
+                    style={ inputBoxStyle }
                 />
             </label>
             <label>
-                Assets Deposited:
+                <strong>Assets Deposited: </strong>
                 <input
                     type="text"
+                    placeholder='Number of assets deposited'
                     value={assetsDeposited}
                     onChange={e => setAssetsDeposited(e.target.value)}
+                    style={ inputBoxStyle }
                 />
             </label>
-            <input type="submit" value="Submit" />
+            <button type='submit' 
+                    style={{ 
+                        backgroundColor: '#C94091',
+                        border: '1px solid',
+                        borderColor: '#C94091',
+                        borderRadius: '10px', 
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        height: '50px',
+                        width: '75%',
+                        padding: '10px',
+                        marginTop: '20px',
+                        marginBottom: '40px'
+                        }}
+            >Submit</button>
         </form>
-      </>
-        
+      </>    
+
     );
+        
 }
