@@ -9,6 +9,7 @@ import {
   HUB_FACET_ABI,
   FOUNDRY_FACET_ABI,
 } from '../config'
+import { isApproved } from './metokens';
 
 interface CreateMeToken {
   name: string;
@@ -115,6 +116,7 @@ export const getMeTokenInfo = async (tokenAddress: string, owner: string, signer
   };
 };
 
+
 export const isApprovedAmount = async (
   address: string,
   amount: string,
@@ -128,6 +130,17 @@ export const isApprovedAmount = async (
   const approvalAmount = await erc20.allowance(address, foundryFacet);
   return approvalAmount.gt(amount);
 };
+
+
+export async function getTokenAllowance(address: string, signer: any, amount: string) { 
+  const tokenContract = new ethers.Contract(daiAddress, ERC20_ABI, signer);
+  const allowance = await tokenContract.allowance(address, meTokenApproval);
+  const formattedAllowance = ethers.utils.formatUnits(allowance, 18);
+  console.log('Allowance:', formattedAllowance.toString());
+  
+  return formattedAllowance.toString();
+}
+
 
 export const approveTokens = async (
   amount: any,

@@ -1,0 +1,22 @@
+:local .buy-button {
+  background: #f6b138;
+}
+
+:local .buy-button:hover {
+  border: 2px solid #ededee;
+}
+
+:local .buy-button.disabled-button {
+  //background: #edeeee;
+  opacity: 0.3;
+  border: none;
+  cursor: not-allowed;
+  disabled: True;
+  pointer-events: none;
+}
+
+:local .buy-button.disabled-button:hover {
+  border: 3px solid #e13535;
+  transition: opacity 0.3s ease-in;
+  cursor: not-allowed;
+}

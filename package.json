@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-hook-form": "^7.45.2",
+    "turbo": "^1.10.12"
+  }
+}

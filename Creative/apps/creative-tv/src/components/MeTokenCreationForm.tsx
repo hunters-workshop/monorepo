@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { ConnectWallet, useAddress, useSigner } from '@thirdweb-dev/react'
-import { createMeToken, approveTokens, isApprovedAmount, getMeTokenInfo, mint } from 'utils/fetchers/createMeToken'
+import { createMeToken, approveTokens, isApprovedAmount, getMeTokenInfo, mint, getTokenAllowance } from 'utils/fetchers/createMeToken'
 import { getMeTokenContract } from 'utils/fetchers/createMeToken'
-import { Box, Button, Divider, FormControl, FormErrorMessage, FormLabel, Heading, Input, Stack } from '@chakra-ui/react'
+import { Box, Button, Divider, FormControl, FormErrorMessage, FormLabel, Heading, Input, Stack, useToast } from '@chakra-ui/react'
 import { getMeTokenFor } from 'utils/fetchers/createMeToken'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+import styles from './ComponentStyle.module.css'
+
 
 export default function MeTokenCreationForm() {
   const {
     register,
+    watch,
     handleSubmit,
     getValues,
     formState: { errors },
@@ -24,8 +27,13 @@ export default function MeTokenCreationForm() {
   const [approvalAmount, setApprovalAmount] = useState(0)
   const [meTokenAddress, setMeTokenAddress] = useState('')
   const [meTokenInfo, setMeTokenInfo] = useState<any>(null)
+  const toast = useToast();
   const signer = useSigner()
   const router = useRouter()
+
+  const typedValue = watch('typedValue');
+
+    
 
   useEffect(() => {
     const addy = router.query.address || address
@@ -63,13 +71,40 @@ export default function MeTokenCreationForm() {
     }
   }, [address, signer])
 
+  useEffect(() => {
+    if (address && signer && typedValue){
+      const fetchApprovedAmount = async () => {
+        const compResult = await getTokenAllowance(address, signer, typedValue);        
+        const test = Number(compResult) - typedValue;
+        if (test >= 0) {
+          setApproved(true);
+        } else {
+          setApproved(false);
+        } 
+        };
+        
+        fetchApprovedAmount();  
+    }}, [address, signer, typedValue]);
+    
+
   const approve = async () => {
     const assetsDeposited = getValues('assetsDeposited')
     if (!isApproved && address && assetsDeposited) {
       await approveTokens(assetsDeposited, signer)
-      setApproved(true)
+      setApproved(true)      
+      toast({
+        title: 'Approval Successful!',
+        status: 'success',
+        isClosable: true,
+      });
     } else {
       console.log('Error approving tokens')
+      toast({
+        title: 'Approval Failed.',
+        description: 'There was an error while approving your allowance.',
+        status: 'error',
+        isClosable: true,
+      });
     }
   }
 
@@ -78,7 +113,7 @@ export default function MeTokenCreationForm() {
 
     try {
       const { name, symbol, hubId, assetsDeposited } = data
-      const tx = await createMeToken({ name, symbol, hubId, assetsDeposited }, meTokenContract, signer)
+      const tx = await createMeToken({ name, symbol, hubId, assetsDeposited }, signer )
       console.log(tx)
       setIsSubmitted(true)
     } catch (error) {
@@ -103,11 +138,14 @@ export default function MeTokenCreationForm() {
     }
   }, [isSubmitted])
 
+
+
   const approveBuy = async () => {
-    const purchaseAmount = getValues('purchaseAmount')
+    const purchaseAmount = getValues('typedValue')
     await approveTokens(purchaseAmount, signer)
     setApproved(true)
-  }
+  }             
+ 
 
   const buy = async () => {
     const purchaseAmount = getValues('purchaseAmount')
@@ -142,7 +180,7 @@ export default function MeTokenCreationForm() {
             <img src={meTokenInfo.profilePicture} alt={''} style={{ height: '100px', width: '100px', borderRadius: '12px' }} />
             <FormControl isInvalid={!!errors.name}>
               <FormLabel color="white">Amount to purchase (DAI):</FormLabel>
-              <Input type="text" placeholder="Amount To Purchase" {...register('purchaseAmount', { required: true })} />
+              <Input type="text" placeholder="Amount To Purchase" {...register('typedValue', { required: true, })} />
               <FormErrorMessage>This field is required</FormErrorMessage>
             </FormControl>
             <Button
@@ -154,10 +192,13 @@ export default function MeTokenCreationForm() {
               Approve
             </Button>
             <Button
-            background="linear-gradient(to right, #E03C88, #E34335, #F6B138)"
-            onClick={buy}
-            variant="solid"
-            disabled={isApproved}
+              background="linear-gradient(to right, #E03C88, #E34335, #F6B138)"
+              onClick={buy}
+              variant="solid"
+              className={`${styles['buy-button']} ${
+                !isApproved ? styles['disabled-button'] : ''
+              }`}
+              disabled={isApproved}
             >
               Buy
             </Button>
